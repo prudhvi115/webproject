@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Prepared Notes</h2>
+    <a href="{% url 'create_note' %}" class="btn-primary">Post New Notes</a>
+</div>
+
+<div class="card-grid">
+    {% for note in notes %}
+    <div class="card">
+        <h3>{{ note.title }}</h3>
+        <p><strong>Subject:</strong> {{ note.subject }}</p>
+        <p>By {{ note.author.username }} on {{ note.created_at|date:"M d, Y" }}</p>
+        <div style="margin-top: 1rem;">
+            <a href="{% url 'note_detail' note.pk %}" class="btn-glow">Read Full Notes</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No notes shared yet. Be the first to post!</p>
+    {% endfor %}
+</div>
+{% endblock %}

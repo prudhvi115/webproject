@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Collaborative Spaces</h2>
+<div class="glass-panel">
+    <div class="card-grid">
+        {% for room in rooms %}
+        <div class="card">
+            <h3>{{ room.name }}</h3>
+            <p>Group: {{ room.group.name }}</p>
+            <a href="{% url 'collaborate_room' room.group.id %}" class="btn-primary">Enter Room</a>
+        </div>
+        {% empty %}
+        <p>You haven't joined any groups yet. <a href="{% url 'group_list' %}">Join a group</a> to collaborate!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
