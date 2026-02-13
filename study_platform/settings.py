@@ -148,5 +148,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# Gemini AI API Key
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyBqG0TWFfwzS6d_FgIZTHmtJEszh5AhVC4')
+# Gemini AI API Key (Key is stored in the hidden .env file)
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')

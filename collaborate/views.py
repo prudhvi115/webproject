@@ -5,15 +5,25 @@ from .models import Room, Message
 from groups.models import StudyGroup
 import json
 
+from django.db.models import Q
+
 @login_required
 def collaborate_home(request):
+    query = request.GET.get('q')
     user_groups = request.user.study_groups.all()
+    
+    if query:
+        user_groups = user_groups.filter(
+            Q(name__icontains=query) | 
+            Q(subject__icontains=query)
+        )
+        
     # Find active rooms for these groups
     rooms = []
     for group in user_groups:
         room, created = Room.objects.get_or_create(group=group, defaults={'name': f"{group.name} Room"})
         rooms.append(room)
-    return render(request, 'collaborate/home.html', {'rooms': rooms})
+    return render(request, 'collaborate/home.html', {'rooms': rooms, 'query': query})
 
 @login_required
 def room_view(request, group_id):

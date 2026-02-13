@@ -10,13 +10,18 @@ from django.conf import settings
 
 # Gemini API Config
 API_KEY = settings.GEMINI_API_KEY
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={API_KEY}"
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
 
 @login_required
 def exam_list(request):
     user_groups = request.user.study_groups.all()
     exams = Exam.objects.filter(group__in=user_groups).order_by('-created_at')
     return render(request, 'exams/exam_list.html', {'exams': exams})
+
+@login_required
+def test_history(request):
+    results = ExamResult.objects.filter(user=request.user).order_by('-completed_at').select_related('exam')
+    return render(request, 'exams/test_history.html', {'results': results})
 
 @login_required
 def generate_test(request, group_id):

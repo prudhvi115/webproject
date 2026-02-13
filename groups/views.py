@@ -9,11 +9,22 @@ from django.conf import settings
 
 # Gemini API Config
 API_KEY = settings.GEMINI_API_KEY
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={API_KEY}"
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
+
+from django.db.models import Q
 
 @login_required
 def group_list(request):
+    query = request.GET.get('q')
     groups = StudyGroup.objects.all().prefetch_related('members')
+    
+    if query:
+        groups = groups.filter(
+            Q(name__icontains=query) | 
+            Q(subject__icontains=query) | 
+            Q(description__icontains=query)
+        )
+        
     user = request.user
     recommended_groups = []
     if user.interests:
@@ -21,7 +32,7 @@ def group_list(request):
         for group in groups:
             if group.subject.lower() in user_interests:
                 recommended_groups.append(group)
-    return render(request, 'groups/group_list.html', {'groups': groups, 'recommended_groups': recommended_groups})
+    return render(request, 'groups/group_list.html', {'groups': groups, 'recommended_groups': recommended_groups, 'query': query})
 
 @login_required
 def create_group(request):
