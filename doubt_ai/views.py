@@ -4,9 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 import requests
+from django.conf import settings
 
-API_KEY = "AIzaSyBqG0TWFfwzS6d_FgIZTHmtJEszh5AhVC4"
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+API_KEY = settings.GEMINI_API_KEY
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={API_KEY}"
 
 def chat_view(request):
     return render(request, 'doubt_ai/chat.html')

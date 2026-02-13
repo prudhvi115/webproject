@@ -6,10 +6,11 @@ from django.http import JsonResponse
 from django.utils import timezone
 from .models import Exam, Question, ExamResult
 from groups.models import StudyGroup
+from django.conf import settings
 
 # Gemini API Config
-API_KEY = "AIzaSyBqG0TWFfwzS6d_FgIZTHmtJEszh5AhVC4"
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+API_KEY = settings.GEMINI_API_KEY
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={API_KEY}"
 
 @login_required
 def exam_list(request):
