@@ -1,15 +1,39 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Find Your Study Squad</h2>
+<h2>{% if query %}Results for "{{ query }}"{% else %}Find Your Study Squad{% endif %}</h2>
 <div class="glass-panel">
-    <h3>Recommended for You</h3>
+    <h3>
+        Recommended for You
+        {% if ai_powered %}
+        <span
+            style="font-size: 0.7rem; background: var(--secondary-color); color: var(--bg-dark); padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 10px; box-shadow: 0 0 10px var(--secondary-color);">AI
+            POWERED</span>
+        {% endif %}
+    </h3>
     <div class="card-grid">
         {% for group in recommended_groups %}
-        <div class="card">
-            <h4>{{ group.name }}</h4>
+        <div class="card" style="border-left: 3px solid var(--secondary-color);">
+            <div style="display: flex; justify-content: space-between;">
+                <h4>{{ group.name }}</h4>
+                <span style="font-size: 0.7rem; color: var(--secondary-color);">MATCH</span>
+            </div>
             <p>{{ group.description|truncatechars:100 }}</p>
-            <a href="{% url 'group_detail' group.pk %}" class="btn-glow">View Group</a>
+
+
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="{% url 'group_detail' group.pk %}" class="btn-glow">View Group</a>
+                {% if group.id not in joined_group_ids %}
+                <a href="{% url 'join_group' group.pk %}" class="btn-primary">Join</a>
+                {% else %}
+                <a href="{% url 'leave_group' group.pk %}" class="btn-glow"
+                    style="background: rgba(255, 68, 68, 0.1); border-color: #ff4444; color: #ff8888;">Leave</a>
+                {% endif %}
+                {% if group.creator == request.user %}
+                <a href="{% url 'delete_group' group.pk %}" class="btn-primary"
+                    style="background: #ff4444; border: none;" onclick="return confirm('Delete this group?')">Delete</a>
+                {% endif %}
+            </div>
         </div>
         {% empty %}
         <p>No specific recommendations yet. Update your interests in profile!</p>
@@ -29,16 +53,29 @@
     </form>
 
     <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3>All Groups</h3>
+        <h3>{% if query %}Matching Groups{% else %}All Groups{% endif %}</h3>
         <a href="{% url 'create_group' %}" class="btn-primary">Create New Group</a>
     </div>
     <div class="card-grid">
         {% for group in groups %}
         <div class="card">
             <h4>{{ group.name }}</h4>
-            <p>Subject: {{ group.subject }}</p>
+
             <p>Members: {{ group.members.count }}</p>
-            <a href="{% url 'group_detail' group.pk %}" class="btn-glow">View</a>
+
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="{% url 'group_detail' group.pk %}" class="btn-glow">View</a>
+                {% if group.id not in joined_group_ids %}
+                <a href="{% url 'join_group' group.pk %}" class="btn-primary">Join</a>
+                {% else %}
+                <a href="{% url 'leave_group' group.pk %}" class="btn-glow"
+                    style="background: rgba(255, 68, 68, 0.1); border-color: #ff4444; color: #ff8888;">Leave</a>
+                {% endif %}
+                {% if group.creator == request.user %}
+                <a href="{% url 'delete_group' group.pk %}" class="btn-primary"
+                    style="background: #ff4444; border: none;" onclick="return confirm('Delete this group?')">Delete</a>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>

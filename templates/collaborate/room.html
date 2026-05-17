@@ -1,86 +1,469 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .room-container {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 20px;
+        height: calc(100vh - 100px);
+        padding-top: 20px;
+    }
+
+    /* Video Grid Layout */
+    .video-grid {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        position: relative;
+        overflow-y: auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-auto-rows: 250px;
+        gap: 15px;
+        align-content: start;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .video-card {
+        background: #000;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .video-card:hover {
+        border-color: #8ab4f8;
+    }
+
+    .video-card video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .video-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        backdrop-filter: blur(5px);
+        z-index: 5;
+    }
+
+    .video-card.local {
+        border-color: #8ab4f8;
+    }
+
+    .video-card.screen-share {
+        grid-column: span 2;
+        grid-row: span 2;
+        border-color: #c58af9;
+    }
+
+    .wait-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: rgba(255, 255, 255, 0.4);
+        text-align: center;
+        width: 100%;
+        pointer-events: none;
+    }
+
+    .controls {
+        position: fixed;
+        bottom: 30px;
+        left: calc(50% - 175px);
+        /* Offset for sidebar */
+        transform: translateX(-50%);
+        display: flex;
+        gap: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 12px 25px;
+        border-radius: 50px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 100;
+    }
+
+    .control-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .control-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-3px);
+    }
+
+    .control-btn.active {
+        background: #8ab4f8;
+        color: #000;
+    }
+
+    .control-btn.danger {
+        background: rgba(255, 77, 77, 0.2);
+        color: #ff4d4d;
+    }
+
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .panel {
+        background: rgba(22, 27, 34, 0.8);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chat-panel {
+        flex: 1.5;
+    }
+
+    .participants-panel {
+        flex: 1;
+    }
+
+    .panel-header {
+        padding: 15px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-weight: 600;
+        color: #8ab4f8;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .message {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 10px 14px;
+        border-radius: 12px;
+        max-width: 85%;
+    }
+
+    .message.mine {
+        align-self: flex-end;
+        background: rgba(138, 180, 248, 0.15);
+    }
+
+    .chat-input-area {
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px 15px;
+        border-radius: 25px;
+        color: white;
+        outline: none;
+    }
+
+    .participant-list {
+        padding: 15px;
+        overflow-y: auto;
+    }
+
+    .participant {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="display: flex; height: 80vh; gap: 1rem;">
-    <!-- Chat Section -->
-    <div class="glass-panel" style="flex: 1; display: flex; flex-direction: column;">
-        <h3>Chat: {{ room.name }}</h3>
-        <div id="chat-messages"
-            style="flex: 1; overflow-y: auto; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; margin-bottom: 1rem;">
-            <!-- Messages will be loaded here -->
+<div class="room-container">
+    <div class="video-grid" id="video-grid">
+        <div class="wait-message" id="wait-message">
+            <h3>Meeting Grid</h3>
+            <p>Waiting for participants to share video...</p>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
-            <input type="text" id="message-input" placeholder="Type a message..." style="flex: 1; margin-bottom: 0;">
-            <button id="send-btn" class="btn-primary">Send</button>
+
+        <!-- Local User Video Card -->
+        <div class="video-card local" id="local-card" style="display: none;">
+            <video id="local-video-el" autoplay playsinline muted></video>
+            <div class="video-label">You (Camera)</div>
+        </div>
+
+        <!-- Local Screen Card -->
+        <div class="video-card local screen-share" id="local-screen-card" style="display: none;">
+            <video id="local-screen-el" autoplay playsinline muted></video>
+            <div class="video-label">You (Screen)</div>
         </div>
     </div>
 
-    <!-- Video/Screen Share Placeholder -->
-    <div class="glass-panel" style="width: 300px; display: flex; flex-direction: column; gap: 1rem;">
-        <h3>Video Collaboration</h3>
-        <div
-            style="background: black; height: 200px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #555;">
-            Webcam Placeholder
-        </div>
-        <button class="btn-glow" onclick="alert('Starting video call (simulated)...')">Start Video</button>
-        <button class="btn-glow" onclick="alert('Sharing screen (simulated)...')">Share Screen</button>
+    <!-- Floating Controls -->
+    <div class="controls">
+        <button id="cam-btn" class="control-btn" title="Toggle Camera">📷</button>
+        <button id="mic-btn" class="control-btn" title="Toggle Microphone">🎤</button>
+        <button id="scr-btn" class="control-btn" title="Share Screen">🖥️</button>
+        <a href="{% url 'group_list' %}" class="control-btn danger" title="Leave Room">❌</a>
+    </div>
 
-        <h4>Online Members (Simulated)</h4>
-        <ul style="list-style: none; padding: 0;">
-            {% for member in group.members.all %}
-            <li style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">{{ member.username }}</li>
-            {% endfor %}
-        </ul>
+    <div class="sidebar">
+        <div class="panel participants-panel">
+            <div class="panel-header">👥 Participants</div>
+            <div class="participant-list">
+                {% for member in group.members.all %}
+                <div class="participant">
+                    <span class="username">{{ member.username }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel chat-panel">
+            <div class="panel-header">💬 Chat</div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type a message...">
+                <button id="send-btn" class="control-btn" style="width: 40px; height: 40px;">➤</button>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
-    const roomId = {{ room.id }};
-    const chatContainer = document.getElementById('chat-messages');
-    const msgInput = document.getElementById('message-input');
-    const sendBtn = document.getElementById('send-btn');
-    let lastId = 0;
+    const CONFIG = {
+        rid: "{{ room.id }}",
+        user: "{{ user.username }}",
+        pid: ("{{ user.username }}_{{ room.id }}").replace(/\s+/g, '_')
+    };
 
-    function fetchMessages() {
-        const url = "{% url 'get_messages' 0 %}".replace('0', roomId);
-        fetch(url + `?last_id=${lastId}`)
-            .then(response => response.json())
+    const DOM = {
+        grid: document.getElementById('video-grid'),
+        chat: document.getElementById('chat-messages'),
+        input: document.getElementById('chat-input'),
+        send: document.getElementById('send-btn'),
+        wait: document.getElementById('wait-message'),
+        bCam: document.getElementById('cam-btn'),
+        bMic: document.getElementById('mic-btn'),
+        bScr: document.getElementById('scr-btn'),
+        lCard: document.getElementById('local-card'),
+        lVideo: document.getElementById('local-video-el'),
+        lsCard: document.getElementById('local-screen-card'),
+        lsVideo: document.getElementById('local-screen-el')
+    };
+
+    let state = {
+        lastId: {{ max_id }},
+    localStream: null,
+        screenStream: null,
+            peer: null,
+                isMuted: false,
+                    peers: { } // track calls by peerId
+    };
+
+    function initPeer() {
+        state.peer = new Peer(CONFIG.pid, {
+            config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+        });
+
+        state.peer.on('open', (id) => console.log('Peer Connected:', id));
+
+        state.peer.on('call', (call) => {
+            console.log('Receiving call from:', call.peer);
+            // Always answer with whatever we are sharing (or nothing)
+            call.answer(state.localStream || state.screenStream || undefined);
+
+            call.on('stream', (remoteStream) => {
+                addRemoteStream(call.peer, remoteStream);
+            });
+
+            call.on('close', () => removeRemoteStream(call.peer));
+        });
+    }
+
+    function addRemoteStream(peerId, stream) {
+        DOM.wait.style.display = 'none';
+
+        // Extract username from peerId (username_roomid)
+        const username = peerId.split('_')[0];
+        const cardId = `card-${peerId}`;
+
+        if (document.getElementById(cardId)) return;
+
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.id = cardId;
+
+        // Detect if it's a screen share (no audio tracks usually, or we can check labels)
+        const isScreen = stream.getAudioTracks().length === 0;
+        if (isScreen) card.classList.add('screen-share');
+
+        const video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        video.srcObject = stream;
+
+        const label = document.createElement('div');
+        label.className = 'video-label';
+        label.innerText = isScreen ? `${username} (Screen)` : username;
+
+        card.appendChild(video);
+        card.appendChild(label);
+        DOM.grid.appendChild(card);
+    }
+
+    function removeRemoteStream(peerId) {
+        const card = document.getElementById(`card-${peerId}`);
+        if (card) card.remove();
+
+        if (DOM.grid.querySelectorAll('.video-card').length === 0) {
+            DOM.wait.style.display = 'block';
+        }
+    }
+
+    async function toggleCam() {
+        if (!state.localStream) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                state.localStream = stream;
+                DOM.lVideo.srcObject = stream;
+                DOM.lCard.style.display = 'block';
+                DOM.bCam.classList.add('active');
+                DOM.wait.style.display = 'none';
+                broadcast(stream);
+            } catch (e) { alert('Camera access denied'); }
+        } else {
+            state.localStream.getTracks().forEach(t => t.stop());
+            state.localStream = null;
+            DOM.lCard.style.display = 'none';
+            DOM.bCam.classList.remove('active');
+            checkWaitStatus();
+        }
+    }
+
+    async function toggleScreen() {
+        if (!state.screenStream) {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                state.screenStream = stream;
+                DOM.lsVideo.srcObject = stream;
+                DOM.lsCard.style.display = 'block';
+                DOM.bScr.classList.add('active');
+                DOM.wait.style.display = 'none';
+                broadcast(stream);
+
+                stream.getVideoTracks()[0].onended = () => {
+                    if (state.screenStream) toggleScreen();
+                };
+            } catch (e) { console.error(e); }
+        } else {
+            state.screenStream.getTracks().forEach(t => t.stop());
+            state.screenStream = null;
+            DOM.lsCard.style.display = 'none';
+            DOM.bScr.classList.remove('active');
+            checkWaitStatus();
+        }
+    }
+
+    function checkWaitStatus() {
+        const visibleCards = Array.from(DOM.grid.querySelectorAll('.video-card'))
+            .filter(c => c.style.display !== 'none');
+        if (visibleCards.length === 0) DOM.wait.style.display = 'block';
+    }
+
+    function toggleMic() {
+        if (!state.localStream) return;
+        const track = state.localStream.getAudioTracks()[0];
+        if (track) {
+            state.isMuted = !state.isMuted;
+            track.enabled = !state.isMuted;
+            DOM.bMic.classList.toggle('active', !state.isMuted);
+        }
+    }
+
+    function broadcast(stream) {
+        if (!state.peer) return;
+        // Call all members in the group
+        document.querySelectorAll('.participant-list .username').forEach(el => {
+            const username = el.innerText.trim();
+            if (username !== CONFIG.user) {
+                const targetPeerId = `${username}_${CONFIG.rid}`.replace(/\s+/g, '_');
+                state.peer.call(targetPeerId, stream);
+            }
+        });
+    }
+
+    function sync() {
+        fetch(`{% url 'get_messages' 999 %}`.replace('999', CONFIG.rid) + `?last_id=${state.lastId}`)
+            .then(r => r.json())
             .then(data => {
                 if (data.messages && data.messages.length > 0) {
                     data.messages.forEach(msg => {
                         const div = document.createElement('div');
-                        div.style.marginBottom = '0.5rem';
-                        div.innerHTML = `<strong>${msg.sender}</strong> <span style="font-size: 0.8em; color: gray;">${msg.timestamp}</span><br>${msg.content}`;
-                        chatContainer.appendChild(div);
-                        lastId = msg.id;
+                        div.className = `message ${msg.sender === CONFIG.user ? 'mine' : ''}`;
+                        div.innerHTML = `<strong>${msg.sender}</strong><br>${msg.content}`;
+                        DOM.chat.appendChild(div);
+                        state.lastId = msg.id;
                     });
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    DOM.chat.scrollTop = DOM.chat.scrollHeight;
                 }
             });
     }
 
-    sendBtn.addEventListener('click', () => {
-        const content = msgInput.value.trim();
+    DOM.bCam.onclick = toggleCam;
+    DOM.bScr.onclick = toggleScreen;
+    DOM.bMic.onclick = toggleMic;
+    DOM.send.onclick = () => {
+        const content = DOM.input.value.trim();
         if (!content) return;
-
-        const url = "{% url 'send_message' 0 %}".replace('0', roomId);
-        fetch(url, {
+        fetch(`{% url 'send_message' 999 %}`.replace('999', CONFIG.rid), {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ content: content })
-        }).then(res => {
-            if (res.ok) {
-                msgInput.value = '';
-                fetchMessages(); // Refresh immediately
-            }
-        });
-    });
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ content })
+        }).then(() => { DOM.input.value = ''; sync(); });
+    };
 
-    // Poll every 3 seconds
-    setInterval(fetchMessages, 3000);
-    fetchMessages(); // Initial load
+    DOM.input.onkeypress = (e) => { if (e.key === 'Enter') DOM.send.click(); };
+
+    initPeer();
+    setInterval(sync, 4000);
 </script>
 {% endblock %}

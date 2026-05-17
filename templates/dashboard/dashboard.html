@@ -19,20 +19,40 @@
             <p><strong>Learning Style:</strong> {{ user.learning_style }}</p>
             <p><strong>Interests:</strong> {{ user.interests }}</p>
         </div>
-        <a href="#" class="btn-glow" style="margin-top: 1rem; display: block;">Edit Profile</a>
+        <a href="{% url 'profile_edit' %}" class="btn-glow" style="margin-top: 1rem; display: block;">Edit Profile</a>
+        <a href="{% url 'view_schedule' %}" class="btn-glow"
+            style="margin-top: 0.5rem; display: block; text-align: center; border-color: #aa88ff; background: rgba(170,136,255,0.1);">📅
+            Weekly Schedule</a>
     </div>
 
     <!-- Main Dashboard -->
     <div style="flex: 1;">
         <h2>Your Progress</h2>
-        <div class="glass-panel" style="display: flex; justify-content: space-around; text-align: center;">
-            <div>
-                <h3>{{ groups.count }}</h3>
-                <p>Study Groups</p>
+        <div class="glass-panel"
+            style="display: flex; justify-content: space-around; text-align: center; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 100px;">
+                <h3 style="color: var(--secondary-color); font-size: 2rem;">{{ avg_completion }}%</h3>
+                <p style="font-size: 0.8rem;">Overall Progress</p>
             </div>
-            <div>
-                <h3><a href="{% url 'doubt_ai_chat' %}" style="color: white; text-decoration: none;">ASK</a></h3>
-                <p>Verify Doubts</p>
+            <div style="flex: 1; min-width: 100px;">
+                <h3 style="color: #ffaa44; font-size: 2rem;">{{ daily_progress }}%</h3>
+                <p style="font-size: 0.8rem;">Daily Progress</p>
+            </div>
+            <div style="flex: 1; min-width: 100px;">
+                <h3 style="color: #44ff44; font-size: 2rem;">{{ avg_performance }}%</h3>
+                <p style="font-size: 0.8rem;">Exam Score</p>
+            </div>
+            <div style="flex: 1; min-width: 100px;">
+                <h3 style="color: var(--primary-color); font-size: 2rem;">{{ doubts_count }}</h3>
+                <p style="font-size: 0.8rem;">Doubt AI Views</p>
+            </div>
+            <div style="flex: 1; min-width: 100px;">
+                <h3 style="color: #44ff44; font-size: 2rem;">{{ total_notes }}</h3>
+                <p style="font-size: 0.8rem;">Study Notes</p>
+            </div>
+            <div style="flex: 1; min-width: 100px;">
+                <h3 style="color: #aa88ff; font-size: 2rem;">{{ groups.count }}</h3>
+                <p style="font-size: 0.8rem;">Active Groups</p>
             </div>
         </div>
 
@@ -41,8 +61,17 @@
             {% for group in groups %}
             <div class="card">
                 <h4>{{ group.name }}</h4>
-                <a href="{% url 'group_detail' group.pk %}" class="btn-glow">View Group</a>
-                <a href="{% url 'collaborate_room' group.pk %}" class="btn-glow">Enter Room</a>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <a href="{% url 'group_detail' group.pk %}" class="btn-glow" style="text-align: center;">View
+                        Group</a>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'collaborate_room' group.pk %}" class="btn-glow"
+                            style="flex: 1; text-align: center;">Enter Room</a>
+                        <a href="{% url 'leave_group' group.pk %}" class="btn-glow"
+                            style="flex: 1; text-align: center; background: rgba(255, 68, 68, 0.1); border-color: #ff4444; color: #ff8888; font-size: 0.8rem;">Leave</a>
+                    </div>
+                </div>
             </div>
             {% empty %}
             <p>You are not in any groups. <a href="{% url 'group_list' %}">Join one!</a></p>

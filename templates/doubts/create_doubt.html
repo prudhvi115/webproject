@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-panel" style="max-width: 800px; margin: 2rem auto;">
+    <h2>Ask the Community</h2>
+    <p style="margin-bottom: 2rem; opacity: 0.7;">State your doubt clearly and peers will help you out!</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Doubt Title</label>
+        <input type="text" name="title" placeholder="e.g. How to solve second-order differential equations?" required>
+
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Subject</label>
+        <input type="text" name="subject" placeholder="e.g. Mathematics" required>
+
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Details</label>
+        <textarea name="content" rows="6" placeholder="Describe your doubt in detail. Mention what you've tried so far."
+            required></textarea>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button type="submit" class="btn-primary" style="flex: 1;">Post Doubt</button>
+            <a href="{% url 'doubt_list' %}" class="btn-glow"
+                style="flex: 1; text-align: center; text-decoration: none; padding-top: 0.8rem;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

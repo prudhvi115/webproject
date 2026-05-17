@@ -2,11 +2,91 @@
 
 {% block content %}
 <div class="glass-panel" style="max-width: 600px; margin: auto;">
-    <h2>Create a Study Group</h2>
+    <h2>🚀 Create a New Study Squad</h2>
+    <p style="opacity: 0.7; margin-bottom: 2rem;">Define your group's focus, learning style, and level to attract the
+        right members.</p>
+
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn-primary">Create Group</button>
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn-primary" style="flex: 1;">Launch Group</button>
+            <a href="{% url 'group_list' %}" class="btn-glow"
+                style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Back
+                to List</a>
+        </div>
     </form>
 </div>
+
+<style>
+    form p {
+        margin-bottom: 1.2rem;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: white;
+        margin-top: 0.3rem;
+    }
+
+    label {
+        font-weight: bold;
+        color: var(--secondary-color);
+        display: block;
+        margin-top: 1rem;
+    }
+
+    /* Style for Radio Buttons */
+    ul[id^="id_preferred_learning_style"],
+    ul[id^="id_difficulty_level"],
+    ul[id^="id_learning_style"] {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
+    ul[id^="id_preferred_learning_style"] li,
+    ul[id^="id_difficulty_level"] li,
+    ul[id^="id_learning_style"] li {
+        display: flex;
+        align-items: center;
+    }
+
+    ul li input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 0.5rem;
+        cursor: pointer;
+        accent-color: var(--primary-color);
+    }
+
+    ul li label {
+        margin-top: 0 !important;
+        font-weight: normal !important;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+        display: inline !important;
+    }
+
+    ul li:has(input[type="radio"]:checked) label {
+        color: var(--secondary-color);
+        font-weight: bold !important;
+    }
+
+    ul li label:hover {
+        color: var(--secondary-color);
+    }
+</style>
 {% endblock %}

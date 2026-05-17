@@ -6,5 +6,8 @@ urlpatterns = [
     path('create/', views.create_group, name='create_group'),
     path('<int:pk>/', views.group_detail, name='group_detail'),
     path('<int:pk>/join/', views.join_group, name='join_group'),
+    path('<int:pk>/leave/', views.leave_group, name='leave_group'),
+    path('<int:pk>/delete/', views.delete_group, name='delete_group'),
     path('<int:pk>/complete/<int:day_num>/', views.complete_day, name='complete_day'),
+    path('<int:pk>/advance/', views.advance_week, name='advance_week'),
 ]

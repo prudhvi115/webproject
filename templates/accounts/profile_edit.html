@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="glass-panel" style="max-width: 600px; margin: auto;">
+    <h2>Update Your Profile & Preferences</h2>
+    <p style="opacity: 0.7; margin-bottom: 1.5rem;">Personalize your learning experience to get better group
+        recommendations.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn-primary" style="flex: 1;">Save Changes</button>
+            <a href="{% url 'dashboard' %}" class="btn-glow"
+                style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    form p {
+        margin-bottom: 1.2rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: white;
+        margin-top: 0.3rem;
+    }
+
+    label {
+        font-weight: bold;
+        color: var(--secondary-color);
+        display: block;
+        margin-top: 1rem;
+    }
+
+    /* Style for Radio Buttons */
+    ul[id^="id_learning_style"] {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
+    ul[id^="id_learning_style"] li {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    ul li label {
+        margin-top: 0 !important;
+        font-weight: normal !important;
+        cursor: pointer;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: block !important;
+    }
+
+    ul li input[type="radio"] {
+        display: none;
+    }
+
+    ul li input[type="radio"]:checked+label {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 0 15px rgba(100, 100, 255, 0.4);
+    }
+
+    ul li label:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .helptext {
+        display: block;
+        font-size: 0.8rem;
+        opacity: 0.6;
+        margin-top: 0.2rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Weekly Learning Schedule | AstraLearn{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="max-width: 900px; margin: 2rem auto; position: relative; overflow: hidden;">
+    <!-- Background element specific to this panel -->
+    <div
+        style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(160,160,255,0.1) 0%, rgba(0,0,0,0) 70%); border-radius: 50%;">
+    </div>
+
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 2rem;">
+        <h2 style="margin: 0;">Weekly Learning Schedule</h2>
+        <div
+            style="background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem;">
+            Week <span style="color: var(--primary-color); font-weight: bold; font-size: 1.2rem;">{{
+                schedule.current_week }}</span> / 16
+        </div>
+    </div>
+
+    <div class="schedule-content" style="margin-top: 1rem; color: #e0e0e0;">
+        {% if weekly_content.title != "Error" %}
+        <h3 style="color: var(--secondary-color); margin-bottom: 1.5rem;">{{ weekly_content.title }}</h3>
+        <div class="markdown-body"
+            style="background: rgba(0,0,0,0.2); padding: 2rem; border-radius: 12px; line-height: 1.8; border: 1px solid rgba(255,255,255,0.05);">
+            {{ weekly_content.content|linebreaks }}
+        </div>
+        {% else %}
+        <div
+            style="padding: 2rem; text-align: center; color: #ff6b6b; background: rgba(255,107,107,0.1); border-radius: 12px;">
+            <h3>Error Generatiing Schedule</h3>
+            <p>{{ weekly_content.content }}</p>
+            <form action="{% url 'view_schedule' %}" method="get">
+                <button type="submit" class="btn-glow" style="margin-top: 1rem;">Try Again</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+        <p style="margin-bottom: 1rem; opacity: 0.7; font-size: 0.9rem;">
+            {% if schedule.current_week == 16 %}
+            You have reached the end of the course cycle. Completing this week will restart from Week 1.
+            {% else %}
+            Complete the tasks above to unlock the next week's schedule.
+            {% endif %}
+        </p>
+
+        <form action="{% url 'complete_week' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary"
+                style="padding: 1rem 3rem; font-size: 1.1rem; border-radius: 30px; transition: transform 0.2s;">
+                {% if schedule.current_week == 16 %}
+                Complete Cycle & Restart 🔄
+                {% else %}
+                Mark Week {{ schedule.current_week }} as Complete ✅
+                {% endif %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

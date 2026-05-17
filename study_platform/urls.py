@@ -31,6 +31,7 @@ urlpatterns = [
     path('doubt-ai/', include('doubt_ai.urls')),
     path('notes/', include('notes.urls')),
     path('exams/', include('exams.urls')),
+    path('doubt-peer/', include('doubts.urls')),
 ]
 
 if settings.DEBUG:

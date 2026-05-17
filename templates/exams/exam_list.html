@@ -14,8 +14,7 @@
         {% for exam in exams %}
         <div class="card">
             <h4>{{ exam.title }}</h4>
-            <p>Group: {{ exam.group.name }}</p>
-            <p>Released: {{ exam.created_at|date:"M d, Y" }}</p>
+
             <div style="margin-top: 1rem;">
                 <a href="{% url 'take_exam' exam.id %}" class="btn-primary">Take Test</a>
             </div>

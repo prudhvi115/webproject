@@ -13,6 +13,7 @@
 
 <body>
     <div class="stars"></div>
+    <div class="moon"></div>
     <div class="shooting-stars">
         <div class="shooting-star"></div>
         <div class="shooting-star"></div>
@@ -70,6 +71,14 @@
     </footer>
 
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        // Force reload on back button navigation to prevent viewing cached authenticated pages after logout
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (typeof window.performance != 'undefined' && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 

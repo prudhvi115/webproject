@@ -38,3 +38,24 @@ class UserProgress(models.Model):
     
     class Meta:
         unique_together = ('user', 'resource')
+
+class CourseSchedule(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=200, default="General Learning")
+    current_week = models.IntegerField(default=1)
+    
+    def __str__(self):
+        return f"{self.user.username}'s Schedule - Week {self.current_week}"
+
+class WeeklyContent(models.Model):
+    schedule = models.ForeignKey(CourseSchedule, on_delete=models.CASCADE, related_name='weeks')
+    week_number = models.IntegerField()
+    title = models.CharField(max_length=200)
+    content = models.TextField() # Markdown content from AI
+    
+    class Meta:
+        unique_together = ('schedule', 'week_number')
+        ordering = ['week_number']
+        
+    def __str__(self):
+        return f"Week {self.week_number}: {self.title}"

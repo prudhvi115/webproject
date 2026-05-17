@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>Peer Doubts</h2>
+    <a href="{% url 'create_doubt' %}" class="btn-primary">Ask a Question</a>
+</div>
+
+<div class="glass-panel" style="margin-bottom: 2rem;">
+    <form method="GET" action="{% url 'doubt_list' %}" style="display: flex; gap: 0.5rem;">
+        <input type="text" name="q" placeholder="Search by title, subject, or content..." value="{{ query|default:'' }}"
+            style="flex: 1; margin-bottom: 0;">
+        <button type="submit" class="btn-primary">Search</button>
+        {% if query %}
+        <a href="{% url 'doubt_list' %}" class="btn-glow"
+            style="text-decoration: none; display: flex; align-items: center;">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card-grid">
+    {% for doubt in doubts %}
+    <div class="card">
+        <h3>{{ doubt.title }}</h3>
+        <p><strong>Subject:</strong> {{ doubt.subject }}</p>
+        <p>By {{ doubt.author.username }} on {{ doubt.created_at|date:"M d, Y" }}</p>
+        <div style="margin-top: 1rem;">
+            <a href="{% url 'doubt_detail' doubt.pk %}" class="btn-glow">View Detailed Doubt & {{ doubt.answers.count }}
+                Answers</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No doubts posted yet. Be the first to ask!</p>
+    {% endfor %}
+</div>
+{% endblock %}

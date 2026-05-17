@@ -17,7 +17,13 @@
         {% for room in rooms %}
         <div class="card">
             <h3>{{ room.name }}</h3>
-            <p>Group: {{ room.group.name }}</p>
+
+
+            {% if room.video_active %}
+            <span
+                style="background: var(--accent-color); color: white; padding: 0.2rem 0.5rem; border-radius: 5px; font-size: 0.8rem; display: inline-block; margin-bottom: 0.5rem;">●
+                LIVE VIDEO</span>
+            {% endif %}
             <a href="{% url 'collaborate_room' room.group.id %}" class="btn-primary">Enter Room</a>
         </div>
         {% empty %}
